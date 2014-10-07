@@ -25,15 +25,18 @@ RUN \
     --add-module=/root/sources/nginx-sticky-module-ng && \
   make && \
   make install && \
-  echo "\ndaemon off;" >> /etc/nginx/nginx.conf && \
+  rm -rf /etc/nginx/nginx.conf && \
   rm -rf ~/sources
+
+# add nginx config
+ADD ./nginx.conf /etc/nginx/nginx.conf 
 
 # Install confd
 RUN curl -L https://github.com/kelseyhightower/confd/releases/download/v0.3.0/confd_0.3.0_linux_amd64.tar.gz | tar xz
 RUN mv confd /usr/local/bin/confd
 
 # Remove default site
-RUN rm -f /etc/nginx/sites-enabled/default
+RUN rm -f /etc/nginx/sites-enabled/default && mkdir /etc/nginx/sites-enabled
 
 # Add boot script
 ADD ./bin/boot.sh /boot.sh
