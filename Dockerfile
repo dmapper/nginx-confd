@@ -4,10 +4,29 @@ FROM dockerfile/ubuntu
 RUN \
   add-apt-repository -y ppa:nginx/stable && \
   apt-get update && \
-  apt-get install -y nginx && \
+  apt-get install -y libpcre3-dev libpcrecpp0 libssl-dev zlib1g-dev && \
   rm -rf /var/lib/apt/lists/* && \
+  mkdir ~/sources && \
+  cd ~/sources && \
+  wget http://nginx.org/download/nginx-1.6.2.tar.gz && \
+  tar -zxvf nginx-1.6.2.tar.gz && \
+  git clone https://bitbucket.org/nginx-goodies/nginx-sticky-module-ng.git && \
+  cd nginx-1.6.2 && \
+  ./configure \
+    --prefix=/etc/nginx \
+    --conf-path=/etc/nginx/nginx.conf \
+    --sbin-path=/usr/sbin/nginx \
+    --pid-path=/var/log/nginx/nginx.pid \
+    --error-log-path=/var/log/nginx/error.log \
+    --http-log-path=/var/log/nginx/access.log \
+    --with-http_ssl_module \
+    --with-http_gzip_static_module \
+    --with-http_stub_status_module \
+    --add-module=/root/sources/nginx-sticky-module-ng && \
+  make && \
+  make install && \
   echo "\ndaemon off;" >> /etc/nginx/nginx.conf && \
-  chown -R www-data:www-data /var/lib/nginx
+  rm -rf ~/sources
 
 # Install confd
 RUN curl -L https://github.com/kelseyhightower/confd/releases/download/v0.3.0/confd_0.3.0_linux_amd64.tar.gz | tar xz

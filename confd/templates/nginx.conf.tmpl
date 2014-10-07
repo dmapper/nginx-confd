@@ -1,4 +1,5 @@
 upstream app {
+  sticky;
   {{ range $server := .announce_services_web }}
   server {{ $server.Value }};
   {{ end }}
